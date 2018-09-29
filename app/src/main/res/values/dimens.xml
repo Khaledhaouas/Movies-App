@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_default_marginEnd">10dp</dimen>
+    <dimen name="card_default_marginStart">10dp</dimen>
+    <dimen name="card_default_marginTop">5dp</dimen>
+    <dimen name="card_default_marginBottom">5dp</dimen>
+</resources>
