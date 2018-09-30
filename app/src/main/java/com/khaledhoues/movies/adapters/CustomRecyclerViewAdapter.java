@@ -24,9 +24,11 @@ import static android.content.ContentValues.TAG;
 public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<Article> mDataSet;
+    private ArticleItemClickListener articleItemClickListener;
 
-    public CustomRecyclerViewAdapter(ArrayList<Article> dataSet) {
+    public CustomRecyclerViewAdapter(ArrayList<Article> dataSet, ArticleItemClickListener articleItemClickListener) {
         mDataSet = dataSet;
+        this.articleItemClickListener = articleItemClickListener;
     }
 
 
@@ -41,7 +43,7 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CustomRecyclerViewAdapter.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull final CustomRecyclerViewAdapter.ViewHolder viewHolder, final int position) {
 
         viewHolder.getTxtTitle().setText(mDataSet.get(position).getTitle());
         viewHolder.getTxtDesc().setText(mDataSet.get(position).getDescription());
@@ -52,6 +54,16 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
                 .into(viewHolder.getImgThumbnail());
 
         setAnimation(viewHolder.getCardLayout());
+
+
+        // Define click listener for the ViewHolder's View.
+        viewHolder.getCardLayout().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Element " + viewHolder.getAdapterPosition() + " clicked.");
+                articleItemClickListener.onArticleItemClick(viewHolder.getAdapterPosition(), mDataSet.get(position), viewHolder.getImgThumbnail());
+            }
+        });
 
     }
 
@@ -68,7 +80,6 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
 
     private void setAnimation(View viewToAnimate) {
         // If the bound view wasn't previously displayed on screen, it's animated
-
         Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), android.R.anim.slide_in_left);
         viewToAnimate.startAnimation(animation);
 
@@ -88,13 +99,7 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
 
         public ViewHolder(View v) {
             super(v);
-            // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-                }
-            });
+
             mCardLayout = (CardView) v.findViewById(R.id.card_view);
             mTxtTitle = (TextView) v.findViewById(R.id.txt_card_title);
             mTxtDesc = (TextView) v.findViewById(R.id.txt_card_content);
@@ -121,5 +126,9 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
         public CardView getCardLayout() {
             return mCardLayout;
         }
+    }
+
+    public interface ArticleItemClickListener {
+        public void onArticleItemClick(int adapterPosition, Article article, ImageView imgThumbnail);
     }
 }

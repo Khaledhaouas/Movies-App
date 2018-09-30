@@ -2,17 +2,23 @@ package com.khaledhoues.movies.activities;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
 
 import com.khaledhoues.movies.R;
 import com.khaledhoues.movies.adapters.CustomRecyclerViewAdapter;
 import com.khaledhoues.movies.entities.Article;
+import com.khaledhoues.movies.utils.SharedInformation;
 import com.khaledhoues.movies.viewmodels.ArticlesViewModel;
 
 import java.util.ArrayList;
@@ -45,7 +51,23 @@ public class MainActivity extends AppCompatActivity {
         setRecyclerViewLayoutManager();
 
 
-        mAdapter = new CustomRecyclerViewAdapter(new ArrayList<Article>());
+        mAdapter = new CustomRecyclerViewAdapter(new ArrayList<Article>(), new CustomRecyclerViewAdapter.ArticleItemClickListener() {
+            @Override
+            public void onArticleItemClick(int adapterPosition, Article article, ImageView imgThumbnail) {
+                Intent intent = new Intent(MainActivity.this, ArticleDetailsActivity.class);
+//                intent.putExtra("Article",  article.getImage());
+                SharedInformation.setSharedArticle(article);
+                intent.putExtra("TransitionName", "thumbnailTransition");
+
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        MainActivity.this,
+                        imgThumbnail,
+                        "thumbnailTransition");
+
+                startActivity(intent, options.toBundle());
+            }
+        });
+
         mRecyclerView.setAdapter(mAdapter);
 
         mArticleViewModel.getAllArticles().observe(this, new Observer<List<Article>>() {
@@ -69,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
                 }, 2000);
 
 
-
             }
         });
+
 
     }
 
