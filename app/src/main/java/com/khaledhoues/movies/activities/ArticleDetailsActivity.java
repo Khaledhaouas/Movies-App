@@ -1,5 +1,7 @@
 package com.khaledhoues.movies.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -10,9 +12,13 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -79,12 +85,14 @@ public class ArticleDetailsActivity extends AppCompatActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         supportStartPostponedEnterTransition();
+                        ((LinearLayout) findViewById(R.id.animated_layout)).setVisibility(View.VISIBLE);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         supportStartPostponedEnterTransition();
+                        ((LinearLayout) findViewById(R.id.animated_layout)).setVisibility(View.VISIBLE);
                         return false;
                     }
                 })
@@ -94,9 +102,12 @@ public class ArticleDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onChanged(@Nullable Article article) {
                     if (article != null) {
-                        mTxtArticleAuthor.setText(article.getAuthor());
-                        mTxtArticleContent.setText(article.getContent());
-                        mProgressBar.setVisibility(View.GONE);
+                        if (!article.getAuthor().isEmpty()) {
+                            mTxtArticleAuthor.setText(article.getAuthor());
+                            mTxtArticleContent.setText(article.getContent());
+                            mProgressBar.setVisibility(View.GONE);
+                        }
+
                     }
                 }
             });
@@ -105,7 +116,35 @@ public class ArticleDetailsActivity extends AppCompatActivity {
             mTxtArticleContent.setText(mArticle.getContent());
             mProgressBar.setVisibility(View.GONE);
         }
-
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Animation startFadeOutAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+        startFadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ((CardView) findViewById(R.id.animated_card)).setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        ((CardView) findViewById(R.id.animated_card)).startAnimation(startFadeOutAnimation);
+
+
+        super.onBackPressed();
+    }
 }
