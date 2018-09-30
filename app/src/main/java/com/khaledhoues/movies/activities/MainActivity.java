@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable final List<Article> articles) {
                 mAdapter.setArticles(articles);
-
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -82,15 +82,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 mArticleViewModel.refreshArticlesList();
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    }
-                }, 2000);
-
-
             }
         });
 
