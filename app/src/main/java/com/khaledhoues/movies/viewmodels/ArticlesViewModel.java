@@ -16,10 +16,11 @@ public class ArticlesViewModel extends AndroidViewModel {
     public ArticlesViewModel(Application application) {
         super(application);
         mRepository = new ArticleRepository(application);
-        mAllArticles = mRepository.getAllArticles();
+//        mAllArticles = mRepository.getAllArticles();
     }
 
     public LiveData<List<Article>> getAllArticles() {
+         mAllArticles  = mRepository.getAllArticles();
         return mAllArticles;
     }
 
@@ -29,6 +30,10 @@ public class ArticlesViewModel extends AndroidViewModel {
 
     public void insert(Article word) {
         mRepository.insert(word);
+    }
+
+    public LiveData<Article> getArticle(int id) {
+        return mRepository.getArticle(id);
     }
 
 }

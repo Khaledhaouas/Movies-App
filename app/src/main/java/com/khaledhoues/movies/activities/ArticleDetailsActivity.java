@@ -1,6 +1,8 @@
 package com.khaledhoues.movies.activities;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -22,6 +24,7 @@ import com.bumptech.glide.request.target.Target;
 import com.khaledhoues.movies.R;
 import com.khaledhoues.movies.entities.Article;
 import com.khaledhoues.movies.utils.SharedInformation;
+import com.khaledhoues.movies.viewmodels.ArticlesViewModel;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,7 +35,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ArticleDetailsActivity extends AppCompatActivity {
+    private static final String TAG = "ArticleDetailsActivity";
 
+    private ArticlesViewModel mArticleViewModel;
     private Article mArticle;
 
     private ImageView mImgArticleThumbnail;
@@ -42,14 +47,13 @@ public class ArticleDetailsActivity extends AppCompatActivity {
     private TextView mTxtArticleContent;
     private ProgressBar mProgressBar;
 
-    private String author;
-    private String content = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.article_details_fragment);
         supportPostponeEnterTransition();
+
+        mArticleViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
 
         Bundle extras = getIntent().getExtras();
         mArticle = SharedInformation.getSharedArticle();
@@ -69,7 +73,6 @@ public class ArticleDetailsActivity extends AppCompatActivity {
             mImgArticleThumbnail.setTransitionName(imageTransitionName);
         }
 
-
         Glide.with(this)
                 .load(mArticle.getImage())
                 .addListener(new RequestListener<Drawable>() {
@@ -86,52 +89,23 @@ public class ArticleDetailsActivity extends AppCompatActivity {
                     }
                 })
                 .into(mImgArticleThumbnail);
-
-        Content c = new Content();
-        c.execute();
-
-    }
-
-
-    private class Content extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                Document document = Jsoup.connect(mArticle.getLink()).get();
-
-                author = document.getElementsByClass("article-header-author").first().text();
-                Log.e("Author", "doInBackground: " + author);
-
-                Elements elements = document.getElementsByClass("article-body").get(0).children();
-
-                for (Element e : elements) {
-                    if (e.hasText()) {
-                        Log.e("Content", e.text());
-                        content += e.text() + "\n\n";
+        if (mArticle.getAuthor().isEmpty() || mArticle.getContent().isEmpty()) {
+            mArticleViewModel.getArticle(mArticle.getId()).observe(this, new Observer<Article>() {
+                @Override
+                public void onChanged(@Nullable Article article) {
+                    if (article != null) {
+                        mTxtArticleAuthor.setText(article.getAuthor());
+                        mTxtArticleContent.setText(article.getContent());
+                        mProgressBar.setVisibility(View.GONE);
                     }
                 }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
+            });
+        } else {
+            mTxtArticleAuthor.setText(mArticle.getAuthor());
+            mTxtArticleContent.setText(mArticle.getContent());
             mProgressBar.setVisibility(View.GONE);
-            mTxtArticleAuthor.setText(author);
-            mTxtArticleContent.setText(content);
         }
+
     }
+
 }

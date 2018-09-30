@@ -18,6 +18,12 @@ public interface ArticleDao {
     @Query("DELETE FROM article_table")
     void deleteAll();
 
-    @Query("SELECT * from article_table")
+    @Query("SELECT * FROM article_table")
     LiveData<List<Article>> getAllArticles();
+
+    @Query("UPDATE article_table SET author = :author, content = :content WHERE id = :id")
+    void updateArticle(int id, String author, String content);
+
+    @Query("SELECT * FROM article_table WHERE id = :id")
+    LiveData<Article> getArticle(int id);
 }

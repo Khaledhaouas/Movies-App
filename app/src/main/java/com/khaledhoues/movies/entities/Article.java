@@ -46,7 +46,15 @@ public class Article {
     @ColumnInfo(name = "link")
     private String link;
 
+    @ColumnInfo(name = "author")
+    private String author;
+
+    @ColumnInfo(name = "content")
+    private String content;
+
     public Article() {
+        author="";
+        content="";
     }
 
     public Article(int id, @NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
@@ -118,6 +126,24 @@ public class Article {
 
     public void setLink(@NonNull String link) {
         this.link = link;
+    }
+
+    @NonNull
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    @NonNull
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     @Override
