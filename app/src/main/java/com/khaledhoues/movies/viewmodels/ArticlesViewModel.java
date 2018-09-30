@@ -23,6 +23,10 @@ public class ArticlesViewModel extends AndroidViewModel {
         return mAllArticles;
     }
 
+    public void refreshArticlesList() {
+        mRepository.getAllArticlesFromRSS();
+    }
+
     public void insert(Article word) {
         mRepository.insert(word);
     }

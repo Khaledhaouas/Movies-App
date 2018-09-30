@@ -59,12 +59,16 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mArticleViewModel.refreshArticlesList();
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }, 2000);
+
+
 
             }
         });

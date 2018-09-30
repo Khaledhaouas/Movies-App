@@ -6,6 +6,12 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.Root;
+
+@Root(name = "item", strict = false)
 @Entity(tableName = "article_table")
 public class Article {
 
@@ -14,38 +20,50 @@ public class Article {
     @ColumnInfo(name = "id")
     private int id;
 
+    @Element(name = "title")
     @NonNull
     @ColumnInfo(name = "title")
     private String title;
 
+    @Element(name = "description", data = true)
     @NonNull
     @ColumnInfo(name = "description")
     private String description;
 
+    @Attribute(name = "url")
+    @Path("enclosure")
     @NonNull
     @ColumnInfo(name = "image")
     private String image;
 
+    @Element(name = "pubDate")
     @NonNull
     @ColumnInfo(name = "date")
     private String date;
 
+    @Element(name = "link")
+    @NonNull
+    @ColumnInfo(name = "link")
+    private String link;
+
     public Article() {
     }
 
-    public Article(int id, @NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date) {
+    public Article(int id, @NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.image = image;
         this.date = date;
+        this.link = link;
     }
 
-    public Article(@NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date) {
+    public Article(@NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
         this.title = title;
         this.description = description;
         this.image = image;
         this.date = date;
+        this.link = link;
     }
 
 
@@ -91,5 +109,25 @@ public class Article {
 
     public void setDate(@NonNull String date) {
         this.date = date;
+    }
+
+    @NonNull
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(@NonNull String link) {
+        this.link = link;
+    }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", image='" + image + '\'' +
+                ", date='" + date + '\'' +
+                ", link='" + link + '\'' +
+                '}';
     }
 }
