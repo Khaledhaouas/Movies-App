@@ -9,7 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -33,14 +35,15 @@ public class ArticleDetailsActivity extends AppCompatActivity {
 
     private Article mArticle;
 
-    ImageView mImgArticleThumbnail;
-    TextView mTxtArticleTitle;
-    TextView mTxtArticleDate;
-    TextView mTxtArticleAuthor;
-    TextView mTxtArticleContent;
+    private ImageView mImgArticleThumbnail;
+    private TextView mTxtArticleTitle;
+    private TextView mTxtArticleDate;
+    private TextView mTxtArticleAuthor;
+    private TextView mTxtArticleContent;
+    private ProgressBar mProgressBar;
 
     private String author;
-    private String content="";
+    private String content = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class ArticleDetailsActivity extends AppCompatActivity {
         mTxtArticleDate = (TextView) findViewById(R.id.txt_article_date);
         mTxtArticleAuthor = (TextView) findViewById(R.id.txt_article_author);
         mTxtArticleContent = (TextView) findViewById(R.id.txt_card_content);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         mTxtArticleTitle.setText(mArticle.getTitle());
         mTxtArticleDate.setText(mArticle.getDate());
@@ -125,6 +129,7 @@ public class ArticleDetailsActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            mProgressBar.setVisibility(View.GONE);
             mTxtArticleAuthor.setText(author);
             mTxtArticleContent.setText(content);
         }

@@ -26,12 +26,14 @@
             android:minHeight="600dp"
             card_view:cardCornerRadius="35dp">
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
-                android:paddingBottom="250dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="250dp">
+
 
                 <TextView
                     android:id="@+id/txt_article_title"
@@ -86,6 +88,15 @@
                         android:textSize="15sp"
                         android:typeface="sans" />
                 </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30dp"
+                    android:minWidth="50dp"
+                    android:minHeight="50dp" />
 
                 <TextView
                     android:id="@+id/txt_card_content"
