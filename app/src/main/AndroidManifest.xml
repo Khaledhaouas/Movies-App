@@ -13,6 +13,11 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6914440917404990~6312142891"/>
+
         <activity android:name=".activities.MainActivity">
         </activity>
         <activity android:name=".activities.ArticleDetailsActivity" />
