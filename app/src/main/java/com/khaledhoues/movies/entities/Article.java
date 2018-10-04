@@ -52,12 +52,16 @@ public class Article {
     @ColumnInfo(name = "content")
     private String content;
 
+    private String source;
+
     public Article() {
-        author="";
-        content="";
+        author = "";
+        content = "";
+        source = "";
     }
 
     public Article(int id, @NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
+        super();
         this.id = id;
         this.title = title;
         this.description = description;
@@ -67,6 +71,7 @@ public class Article {
     }
 
     public Article(@NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
+        super();
         this.title = title;
         this.description = description;
         this.image = image;
@@ -144,6 +149,14 @@ public class Article {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     @Override

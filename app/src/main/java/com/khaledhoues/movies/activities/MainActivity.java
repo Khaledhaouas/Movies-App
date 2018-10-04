@@ -16,10 +16,7 @@ import com.khaledhoues.movies.adapters.CustomPagerAdapter;
 
 public class MainActivity extends FragmentActivity {
 
-
     private InterstitialAd mInterstitialAd;
-    private NavigationTabStrip navigationTabStrip;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +65,23 @@ public class MainActivity extends FragmentActivity {
         NavigationTabStrip navigationTabStrip = (NavigationTabStrip) findViewById(R.id.nts_top);
         navigationTabStrip.setTabIndex(0, true);
 
-//        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-//        viewPager.setAdapter(new CustomPagerAdapter(this));
-
         ViewPager vpPager = (ViewPager) findViewById(R.id.viewpager);
         CustomPagerAdapter adapterViewPager = new CustomPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
 
         navigationTabStrip.setViewPager(vpPager);
 
-//        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.content, new NewsFragment(), "News")
-//                .addToBackStack("AppFrags")
-//                .commit();
-
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+        super.onDestroy();
+    }
 
     @Override
     public void onBackPressed() {

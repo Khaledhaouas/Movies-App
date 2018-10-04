@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 
 import com.khaledhoues.movies.DAOs.ArticleDao;
 import com.khaledhoues.movies.database.ArticleRoomDatabase;
@@ -35,19 +34,15 @@ public class ArticleRepository {
 
     private ArticleDao mArticleDao;
     private LiveData<List<Article>> mAllArticles;
-    private LiveData<Article> mSelectedArticle;
 
     public ArticleRepository(Application application) {
         ArticleRoomDatabase db = ArticleRoomDatabase.getDatabase(application);
         mArticleDao = db.articleDao();
-//        mAllArticles = mArticleDao.getAllArticles();
-//
-//        getAllArticlesFromRSS();
     }
 
     public LiveData<List<Article>> getAllArticles() {
         mAllArticles = mArticleDao.getAllArticles();
-
+        Objects.requireNonNull(mAllArticles.getValue()).get(0).setSource("offline");
         getAllArticlesFromRSS();
         return mAllArticles;
     }
@@ -98,6 +93,7 @@ public class ArticleRepository {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             mAllArticles = mArticleDao.getAllArticles();
+            Objects.requireNonNull(mAllArticles.getValue()).get(0).setSource("rss");
         }
     }
 
@@ -105,9 +101,7 @@ public class ArticleRepository {
     public void getAllArticlesFromRSS() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create()).build();
-
         RssWebService rssWebService = retrofit.create(RssWebService.class);
-
         Call<RSSFeed> call = rssWebService.loadRSSFeed();
         call.enqueue(new Callback<RSSFeed>() {
             @Override
@@ -116,11 +110,11 @@ public class ArticleRepository {
                     RSSFeed rss = response.body();
                     assert rss != null;
                     System.out.println("Channel title: " + rss.getChannelTitle());
-
                     for (Article article : rss.getArticleList()) {
                         Log.e(TAG, article.toString());
                     }
-                    insertAll(rss.getArticleList());
+//                    if (mAllArticles.getValue().get(0).getTitle().equals(rss.getArticleList().get(0).getTitle()))
+                        insertAll(rss.getArticleList());
                 } else {
                     System.out.println(response.errorBody());
                 }
@@ -134,20 +128,8 @@ public class ArticleRepository {
     }
 
     public LiveData<Article> getArticle(int id) {
-        mSelectedArticle = mArticleDao.getArticle(id);
-//        if (mSelectedArticle.getValue() != null) {
-//            if (mSelectedArticle.getValue().getAuthor().isEmpty() && mSelectedArticle.getValue().getContent().isEmpty()) {
-//                new getContentAndAuthor().execute();
-//                return mSelectedArticle;
-//            } else
-//                return mSelectedArticle;
-//        } else
-//            return mSelectedArticle;
-
-//        Log.e(TAG, "getArticle: "+ mArticleDao.getArticle(id).getValue().toString());
         new getContentAndAuthor().execute();
         return mArticleDao.getArticle(id);
-
     }
 
     private void updateArticle(Article article) {
@@ -169,7 +151,6 @@ public class ArticleRepository {
         }
     }
 
-
     private class getContentAndAuthor extends AsyncTask<Void, Void, Void> {
         private Article mArticle = SharedInformation.getSharedArticle();
 
@@ -183,20 +164,15 @@ public class ArticleRepository {
         protected Void doInBackground(Void... voids) {
             try {
                 Document document = Jsoup.connect(mArticle.getLink()).get();
-
                 mArticle.setAuthor(document.getElementsByClass("article-header-author").first().text());
                 Log.e("Author", "doInBackground: " + mArticle.getAuthor());
-
                 Elements elements = document.getElementsByClass("article-body").get(0).children();
-
                 for (Element e : elements) {
                     if (e.hasText()) {
                         Log.e("Content", e.text());
                         mArticle.setContent(mArticle.getContent() + e.text() + "\n\n");
                     }
                 }
-
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -206,7 +182,6 @@ public class ArticleRepository {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             updateArticle(mArticle);
         }
     }

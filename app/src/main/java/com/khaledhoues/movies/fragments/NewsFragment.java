@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +22,8 @@ import com.khaledhoues.movies.adapters.CustomRecyclerViewAdapter;
 import com.khaledhoues.movies.entities.Article;
 import com.khaledhoues.movies.utils.SharedInformation;
 import com.khaledhoues.movies.viewmodels.ArticlesViewModel;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,40 +35,28 @@ public class NewsFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private CustomRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private RefreshLayout refreshLayout;
 
     public NewsFragment() {
-        // Required empty public constructor
-
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
-
-        View rootView = inflater.inflate(R.layout.fragment_news, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_news, container, false);
 
         mArticleViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
 
-
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         setRecyclerViewLayoutManager();
-
 
         mAdapter = new CustomRecyclerViewAdapter(new ArrayList<Article>(), new CustomRecyclerViewAdapter.ArticleItemClickListener() {
             @Override
@@ -88,28 +77,28 @@ public class NewsFragment extends Fragment {
 
         mRecyclerView.setAdapter(mAdapter);
 
-
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        refreshLayout = (RefreshLayout) rootView.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void onRefresh() {
+            public void onRefresh(RefreshLayout refreshlayout) {
                 mArticleViewModel.refreshArticlesList();
             }
         });
 
-        mSwipeRefreshLayout.setRefreshing(true);
         mArticleViewModel.getAllArticles().observe(this, new Observer<List<Article>>() {
             @Override
             public void onChanged(@Nullable final List<Article> articles) {
-                if (mAdapter != null && mSwipeRefreshLayout != null) {
+                if (mAdapter != null) {
                     if (articles != null && articles.size() > 0 && !articles.get(0).getTitle().isEmpty()) {
                         mAdapter.setArticles(articles);
                         mRecyclerView.setVisibility(View.VISIBLE);
-                        mSwipeRefreshLayout.setRefreshing(false);
+                        ((RefreshLayout) rootView.findViewById(R.id.refreshLayout)).finishRefresh(1000);
                     }
                 }
 
             }
         });
+
 
         return rootView;
     }
@@ -132,13 +121,10 @@ public class NewsFragment extends Fragment {
     public void setRecyclerViewLayoutManager() {
         int scrollPosition = 0;
 
-        // If a layout manager has already been set, get current scroll position.
         if (mRecyclerView.getLayoutManager() != null) {
             scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
                     .findFirstCompletelyVisibleItemPosition();
         }
-
-
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.scrollToPosition(scrollPosition);
     }
