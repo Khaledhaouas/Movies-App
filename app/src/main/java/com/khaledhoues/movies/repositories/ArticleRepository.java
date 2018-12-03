@@ -2,6 +2,10 @@ package com.khaledhoues.movies.repositories;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -19,7 +23,6 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,17 +36,24 @@ public class ArticleRepository {
     private static final String BASE_URL = "https://movieweb.com/movie-news/";
 
     private ArticleDao mArticleDao;
-    private LiveData<List<Article>> mAllArticles;
+    private MutableLiveData<List<Article>> mAllArticles;
+    private MutableLiveData<Article> mArticleData = new MutableLiveData<>();
+    private Application application;
 
     public ArticleRepository(Application application) {
         ArticleRoomDatabase db = ArticleRoomDatabase.getDatabase(application);
+        this.application = application;
         mArticleDao = db.articleDao();
     }
 
     public LiveData<List<Article>> getAllArticles() {
-        mAllArticles = mArticleDao.getAllArticles();
-        Objects.requireNonNull(mAllArticles.getValue()).get(0).setSource("offline");
-        getAllArticlesFromRSS();
+//        Objects.requireNonNull(mAllArticles.getValue()).get(0).setSource("offline");
+        mAllArticles = new MutableLiveData<>();
+        if (isOnline()) {
+            getAllArticlesFromRSS();
+
+        } else
+            mAllArticles.postValue(mArticleDao.getAllArticles());
         return mAllArticles;
     }
 
@@ -92,8 +102,8 @@ public class ArticleRepository {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mAllArticles = mArticleDao.getAllArticles();
-            Objects.requireNonNull(mAllArticles.getValue()).get(0).setSource("rss");
+//            mAllArticles = mArticleDao.getAllArticles();
+//            Objects.requireNonNull(mAllArticles.getValue()).get(0).setSource("rss");
         }
     }
 
@@ -114,7 +124,8 @@ public class ArticleRepository {
                         Log.e(TAG, article.toString());
                     }
 //                    if (mAllArticles.getValue().get(0).getTitle().equals(rss.getArticleList().get(0).getTitle()))
-                        insertAll(rss.getArticleList());
+                    mAllArticles.postValue(rss.getArticleList());
+                    insertAll(rss.getArticleList());
                 } else {
                     System.out.println(response.errorBody());
                 }
@@ -127,9 +138,15 @@ public class ArticleRepository {
         });
     }
 
-    public LiveData<Article> getArticle(int id) {
+    public MutableLiveData<Article> getArticle(final int id) {
         new getContentAndAuthor().execute();
-        return mArticleDao.getArticle(id);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mArticleData.postValue(mArticleDao.getArticle(id));
+            }
+        }).start();
+        return mArticleData;
     }
 
     private void updateArticle(Article article) {
@@ -173,6 +190,7 @@ public class ArticleRepository {
                         mArticle.setContent(mArticle.getContent() + e.text() + "\n\n");
                     }
                 }
+                mArticleData.postValue(mArticle);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -184,5 +202,15 @@ public class ArticleRepository {
             super.onPostExecute(aVoid);
             updateArticle(mArticle);
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = null;
+        if (cm != null) {
+            netInfo = cm.getActiveNetworkInfo();
+        }
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

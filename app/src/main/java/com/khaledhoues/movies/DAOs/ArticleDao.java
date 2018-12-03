@@ -1,6 +1,5 @@
 package com.khaledhoues.movies.DAOs;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
@@ -19,11 +18,11 @@ public interface ArticleDao {
     void deleteAll();
 
     @Query("SELECT * FROM article_table")
-    LiveData<List<Article>> getAllArticles();
+    List<Article> getAllArticles();
 
     @Query("UPDATE article_table SET author = :author, content = :content WHERE id = :id")
     void updateArticle(int id, String author, String content);
 
     @Query("SELECT * FROM article_table WHERE id = :id")
-    LiveData<Article> getArticle(int id);
+    Article getArticle(int id);
 }

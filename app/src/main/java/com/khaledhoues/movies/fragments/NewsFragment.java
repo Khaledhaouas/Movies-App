@@ -76,7 +76,7 @@ public class NewsFragment extends Fragment {
         });
 
         mRecyclerView.setAdapter(mAdapter);
-
+//        ((RefreshLayout) rootView.findViewById(R.id.refreshLayout)).start(1000);
         refreshLayout = (RefreshLayout) rootView.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override

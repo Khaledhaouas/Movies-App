@@ -1,17 +1,12 @@
 package com.khaledhoues.movies.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.ProgressDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
@@ -31,14 +26,6 @@ import com.khaledhoues.movies.R;
 import com.khaledhoues.movies.entities.Article;
 import com.khaledhoues.movies.utils.SharedInformation;
 import com.khaledhoues.movies.viewmodels.ArticlesViewModel;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class ArticleDetailsActivity extends AppCompatActivity {
     private static final String TAG = "ArticleDetailsActivity";
@@ -102,6 +89,7 @@ public class ArticleDetailsActivity extends AppCompatActivity {
                 @Override
                 public void onChanged(@Nullable Article article) {
                     if (article != null) {
+                        Log.e(TAG, "onChanged: ARTICLE " + article.toString());
                         if (!article.getAuthor().isEmpty()) {
                             mTxtArticleAuthor.setText(article.getAuthor());
                             mTxtArticleContent.setText(article.getContent());

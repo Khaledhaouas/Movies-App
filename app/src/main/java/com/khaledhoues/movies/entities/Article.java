@@ -3,6 +3,7 @@ package com.khaledhoues.movies.entities;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -60,6 +61,7 @@ public class Article {
         source = "";
     }
 
+    @Ignore
     public Article(int id, @NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
         super();
         this.id = id;
@@ -70,6 +72,7 @@ public class Article {
         this.link = link;
     }
 
+    @Ignore
     public Article(@NonNull String title, @NonNull String description, @NonNull String image, @NonNull String date, @NonNull String link) {
         super();
         this.title = title;
