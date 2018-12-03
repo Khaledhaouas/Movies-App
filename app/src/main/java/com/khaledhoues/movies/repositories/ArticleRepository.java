@@ -53,7 +53,13 @@ public class ArticleRepository {
             getAllArticlesFromRSS();
 
         } else
-            mAllArticles.postValue(mArticleDao.getAllArticles());
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mAllArticles.postValue(mArticleDao.getAllArticles());
+                }
+            }).start();
+
         return mAllArticles;
     }
 
