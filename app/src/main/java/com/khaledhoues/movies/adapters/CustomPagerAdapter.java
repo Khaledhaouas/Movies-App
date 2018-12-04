@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.khaledhoues.movies.fragments.NewsFragment;
+import com.khaledhoues.movies.fragments.TrailersFragment;
 
 public class CustomPagerAdapter extends FragmentPagerAdapter {
     private static int NUM_ITEMS = 3;
@@ -26,7 +27,7 @@ public class CustomPagerAdapter extends FragmentPagerAdapter {
             case 0: // Fragment # 0 - This will show FirstFragment
                 return new NewsFragment();
             case 1: // Fragment # 0 - This will show FirstFragment different title
-                return new NewsFragment();
+                return new TrailersFragment();
             case 2: // Fragment # 1 - This will show SecondFragment
                 return new NewsFragment();
             default:
